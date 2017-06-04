@@ -1,23 +1,49 @@
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.01, 20000 );
 
-camera.position.set(5, 5, 5);
+var mouse = new THREE.Vector2();
+
+camera.position.set(7, 7, 7);
 camera.lookAt(scene.position);
 camera.up.set(0, 0, 1);
 scene.add(camera);
 
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
 var renderContainer = document.getElementById('threejs-panel');
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( renderContainer.clientWidth, renderContainer.clientHeight );
 renderContainer.appendChild( renderer.domElement );
 
+var shapesGroup = new THREE.Group();
+scene.add(shapesGroup);
+
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+var raycaster = new THREE.Raycaster();
 
 //camera.position.z = 5;
 
 
+var normalMat = new THREE.MeshNormalMaterial();
+var highlightedMat = new THREE.MeshBasicMaterial({color: 0xFFFF00});
+
 function render() {
-    requestAnimationFrame( render );
+    requestAnimationFrame(render);
+    raycaster.setFromCamera(mouse, camera);
+    var intersects = raycaster.intersectObject(shapesGroup, true);
+
+    for (var i = 0; i < shapesGroup.children.length; i++) {
+        shapesGroup.children[i].material = normalMat;
+    }
+
+    console.log(intersects.length);
+    for (var i = 0; i < intersects.length; i++) {
+        intersects[i].object.material = highlightedMat;
+    }
+    if (intersects.length > 0) {
+        renderer.domElement.style = 'cursor: pointer';
+    } else {
+        renderer.domElement.style = 'cursor: default';
+    }
 
     renderer.render(scene, camera);
 }
@@ -75,19 +101,38 @@ document.getElementById('add-pyramid').onclick = function() {
 
     var mat = new THREE.MeshNormalMaterial();
     var mesh = new THREE.Mesh(geo, mat);
-    scene.add(mesh);
+    shapesGroup.add(mesh);
 }
 
 document.getElementById('add-cube').onclick = function() {
     var geo = new THREE.BoxGeometry(1, 1, 1);
     var mat = new THREE.MeshNormalMaterial();
     var mesh = new THREE.Mesh(geo, mat);
-    scene.add(mesh);
+    shapesGroup.add(mesh);
 }
 
 document.getElementById('add-sphere').onclick = function() {
     var geo = new THREE.SphereGeometry(1, 100, 100);
-    var mat = new THREE.MeshNormalMaterial();
+    var mat = new THREE.MeshBasicMaterial({color: 0x00FF00});
     var mesh = new THREE.Mesh(geo, mat);
-    scene.add(mesh);
+    shapesGroup.add(mesh);
 }
+
+var LINK_STATE = null;
+
+document.getElementById('link-button').onclick = function() {
+    LINK_STAT = 1;
+    //renderContainer.setAttribute('style', 'cursor: pointer');
+}
+
+renderer.domElement.onclick = function() {
+    console.log('waddup');
+}
+
+renderContainer.onmousemove = function(event) {
+    mouse.x = (event.clientX - renderContainer.offsetLeft)/renderContainer.clientWidth * 2 - 1;
+    mouse.y = -(event.clientY - renderContainer.offsetTop)/renderContainer.clientHeight * 2 + 1;
+    //console.log(mouse.x, mouse.y);
+}
+
+
