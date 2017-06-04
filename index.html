@@ -16,9 +16,11 @@
     <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:15%;text-align:center">
         <button class="button" id="add-pyramid"><img src="https://s-media-cache-ak0.pinimg.com/originals/22/09/ef/2209ef020027c25f5f08acfc67c10c7d.png">Pyramid</button>
         <button class="button" id="add-cube"><img src="http://www.pngmart.com/files/4/Cube-PNG-File.png">Cube</button>
-        <button class="button" id="add-sphere"><img src="http://dianaprobst.com/wp-content/uploads/2013/08/sphere.png">Sphere</button>
+        <button class="button" id="add-sphere"><img src="img/sphere.png">Sphere</button>
 
         <button class="button" id="link-button">Link</button>
+        <button class="button" id="link-button" onclick="unlinkAll()">Unlink All</button>
+        <button class="button" id="link-button" onclick="clearSandbox()">Clear Sandbox</button>
     </div>
 
     <!-- WebGL Content -->
@@ -27,7 +29,7 @@
     <!-- WebGL Features -->
     <div class="webgl-features">
         <div class="slider-iter">
-            <input type="range" id="slider" min="1" max ="8" value="1" onchange="showValue(this.value)" /><br>
+            <input type="range" id="slider" min="1" max ="12" value="1" onchange="showValue(this.value)" /><br>
             <span id="range">Iterations: 1<br></span>
         </div>
         <div class="legend"> 
@@ -38,6 +40,7 @@
     </div>
     
     <script src="js/three.js"></script>
+    <script src="js/lib.js"></script>
     <script src="js/OrbitControls.js"></script>
     <script src="js/TransformControls.js"></script>
     <script src="js/script.js"></script>

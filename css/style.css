@@ -1,6 +1,6 @@
 html, body{
     height: 100%;
-    font-family: 'Helvetica Neue', Helvetica, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, sans-serif !important;
     margin: 0;
 
     overflow: hidden;
@@ -8,7 +8,6 @@ html, body{
 
 /*-- Title CSS --*/
 h1, h2 {
-    font-family: 'Corben', Georgia, Times, serif;
     text-align: center;
     text-shadow: 1px 1px 1px #ccc;
     font-size: 40px;
@@ -51,15 +50,25 @@ button img {
 }
 
 .slider-iter {
+    padding: 10px;
     position: absolute;
     text-align: center;
 }
 
 .legend {
     position: absolute;
-    background-color: red;
     text-align: center;
-    left: 50%;
+    right: 2%;
+    text-align: right;
     top: 2%;
 }
 
+
+button.button {
+    border-radius: 3px !important;
+}
+
+.w3-sidebar {
+    padding-bottom: 100px;
+    overflow-y: scroll;
+}

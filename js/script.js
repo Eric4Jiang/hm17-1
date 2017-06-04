@@ -23,6 +23,7 @@ var fractalGroup = new THREE.Group();
 scene.add(fractalGroup);
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.maxDistance = 100;
 
 var raycaster = new THREE.Raycaster();
 
@@ -32,6 +33,16 @@ transformControls.setTranslationSnap(0.05);
 transformControls.setRotationSnap(THREE.Math.degToRad(15));
 transformControls.setSpace("world");
 scene.add(transformControls);
+
+var light = new THREE.AmbientLight( 0xAAAAAA ); // soft white light
+scene.add( light );
+
+var light = new THREE.PointLight( 0xffffff, 1, 100 );
+light.position.set( 7, 7, 7 );
+scene.add( light );
+var light = new THREE.PointLight( 0xffffff, 1, 100 );
+light.position.set( -7, -7, 7 );
+scene.add( light );
 
 //camera.position.z = 5;
 
@@ -63,6 +74,7 @@ function render() {
     }
 
 
+    renderer.setClearColor( 0xEEEEEE, 1 );
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
@@ -71,7 +83,7 @@ function render() {
 function init() {
     // create grid
     var gridMat = new THREE.LineBasicMaterial({
-        color: 0xFFFFFF,
+        color: 0x000000,
         linewidth: 3
     });
     for (var x = -5; x <= 5; x++) {
@@ -124,14 +136,16 @@ document.getElementById('add-pyramid').onclick = function() {
     geo.computeFaceNormals();
 
     var mat = new THREE.MeshNormalMaterial();
-    var mesh = new THREE.Mesh(geo, mat);
+    var mesh = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({color: 0x00FF00}));
     shapesGroup.add(mesh);
 }
 
 document.getElementById('add-cube').onclick = function() {
     var geo = new THREE.BoxGeometry(1, 1, 1);
-    var mat = new THREE.MeshNormalMaterial();
-    var mesh = new THREE.Mesh(geo, mat);
+    //var mat = new THREE.MeshNormalMaterial();
+    var mat = new THREE.MeshLambertMaterial({color: 0xFF0000});
+    console.log(mat);
+    var mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({color: 0xFF0000}));
     shapesGroup.add(mesh);
     //transformControls.attach(mesh);
     //scene.add(transformControls);
@@ -177,6 +191,10 @@ renderContainer.onmousemove = function(event) {
 
 function showValue(newValue) {
     document.getElementById("range").innerHTML="Iterations: " + newValue;
+
+    // clear fractal
+    clearGroup(fractalGroup);
+    generate(newValue);
 }
 
 function resize() {
@@ -223,6 +241,7 @@ window.onkeydown = function(e) {
 }
 
 function generate(nIters) {
+
     var transforms = [];
     for (var i = 0; i < LINKS.length; i++) {
         var relTransform = new THREE.Matrix4().getInverse(LINKS[i][0].matrix);
@@ -246,4 +265,19 @@ function generateRecur(nIters, obj, transforms, lvl) {
         fractalGroup.add(replica);
         generateRecur(nIters, replica, transforms, lvl+1);
     }
+}
+
+function unlinkAll() {
+    LINKS = [];
+}
+
+function clearGroup(g) {
+    while (g.children.length > 0)
+        g.remove(g.children[0]);
+}
+
+function clearSandbox() {
+    unlinkAll();
+    clearGroup(shapesGroup);
+    clearGroup(fractalGroup);
 }
