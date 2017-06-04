@@ -1,5 +1,5 @@
 // voxelize a Mesh
-function voxelizeMesh(mesh, cubeSize) {
+function voxelizeMesh(mesh, cubeSize, bBox) {
     var geo = mesh.geometry;
     mesh.geometry.computeBoundingBox();
     var bBox = mesh.geometry.boundingBox;
@@ -40,9 +40,10 @@ function voxelizeMesh(mesh, cubeSize) {
                     }
                 }
 
-                var idx = xCount*yCount*i_x + yCount*i_y + i_z;
-                if (inside)
+                if (inside) {
+                    var idx = xCount*yCount*i_x + yCount*i_y + i_z;
                     voxels[idx] = 1;
+                }
             }
         }
     }
@@ -54,7 +55,40 @@ function voxelizeMesh(mesh, cubeSize) {
     };
 }
 
-// intersect triangle with line x = t, y = `y`, z = `z`
+function voxelizeEllipsoid(x0, y0, z0, a, b, c, bBox) {
+    minX = Math.min(minX, bBox.min.x);
+    minY = Math.min(minY, bBox.min.y);
+    minZ = Math.min(minZ, bBox.min.z);
+    maxX = Math.max(maxX, bBox.max.x);
+    maxY = Math.max(maxY, bBox.max.y);
+    maxZ = Math.max(maxZ, bBox.max.z);
+
+    var xCount = Math.ceil((maxX - minX) / cubeSize) + 1;
+    var yCount = Math.ceil((maxY - minY) / cubeSize) + 1;
+    var zCount = Math.ceil((maxZ - minZ) / cubeSize) + 1;
+
+    var voxels = new Int8Array(xCount * yCount * zCount);
+
+    for (var i_x = 0; i_x < xCount; i_x++) {
+        var x = minX + i_x * cubeSize;
+        for (i_y = 0; i_y < yCount; i_y++) {
+            var y = minY + i_y * cubeSize;
+            var inside = false;
+            for (i_z = 0; i_z < zCount; i_z++) {
+                var z = minZ + i_z * cubeSize;
+
+                if ((x-x0)/a*a + (y-y0)/b*b + (z-z0)/c*c < 1) {
+                    var idx = xCount*yCount*i_x + yCount*i_y + i_z;
+                    voxels[idx] = 1;
+                }
+            }
+        }
+    }
+
+    return voxels;
+}
+
+// intersect triangle with line
 function triIntersectsLine(orig, dir, v0, v1, v2) {
     v1.sub(v0);
     v2.sub(v1);
@@ -76,9 +110,10 @@ function triIntersectsLine(orig, dir, v0, v1, v2) {
     return -1;
 }
 
-function voxelsCmp(voxels1, voxels2) {
+function voxelsCmp(ref, recon, add) {
     var score = 0;
-    for (var i = 0; i < voxels1.length; i++) {
+    for (var i = 0; i < ref.length; i++) {
+        var v = 
         if (voxels1[i] == voxels2[i])
             score++;
         else
