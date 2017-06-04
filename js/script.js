@@ -24,11 +24,6 @@ function render() {
 
 
 function init() {
-    var geo = new THREE.BoxGeometry(1,1, 1);
-    var mat = new THREE.MeshNormalMaterial();
-    var mesh = new THREE.Mesh(geo, mat);
-    scene.add(mesh);
-
     // create grid
     var gridMat = new THREE.LineBasicMaterial({
         color: 0xFFFFFF,
@@ -57,3 +52,42 @@ function init() {
 }
 
 init();
+
+document.getElementById('add-pyramid').onclick = function() {
+    var geo = new THREE.CylinderGeometry(1, 3, 3, 4);
+    geo.vertices = [
+        new THREE.Vector3( 0, 0, 0 ),
+        new THREE.Vector3( 0, 1, 0 ),
+        new THREE.Vector3( 1, 1, 0 ),
+        new THREE.Vector3( 1, 0, 0 ),
+        new THREE.Vector3( 0.5, 0.5, 1 )
+    ];
+
+    geo.faces = [
+        new THREE.Face3( 0, 1, 2 ),
+        new THREE.Face3( 0, 2, 3 ),
+        new THREE.Face3( 1, 0, 4 ),
+        new THREE.Face3( 2, 1, 4 ),
+        new THREE.Face3( 3, 2, 4 ),
+        new THREE.Face3( 0, 3, 4 )
+    ];
+    geo.computeFaceNormals();
+
+    var mat = new THREE.MeshNormalMaterial();
+    var mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+}
+
+document.getElementById('add-cube').onclick = function() {
+    var geo = new THREE.BoxGeometry(1, 1, 1);
+    var mat = new THREE.MeshNormalMaterial();
+    var mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+}
+
+document.getElementById('add-sphere').onclick = function() {
+    var geo = new THREE.SphereGeometry(1, 100, 100);
+    var mat = new THREE.MeshNormalMaterial();
+    var mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+}
