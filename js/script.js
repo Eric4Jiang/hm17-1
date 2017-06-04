@@ -91,3 +91,8 @@ document.getElementById('add-sphere').onclick = function() {
     var mesh = new THREE.Mesh(geo, mat);
     scene.add(mesh);
 }
+
+function showValue(newValue)
+{
+    document.getElementById("range").innerHTML="Current Layers: " + newValue + "<br>";
+}
