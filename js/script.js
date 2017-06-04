@@ -20,13 +20,15 @@ renderContainer.appendChild( renderer.domElement );
 
 var shapesGroup = new THREE.Group();
 scene.add(shapesGroup);
+var fractalGroup = new THREE.Group();
+scene.add(fractalGroup);
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 var raycaster = new THREE.Raycaster();
 
 var transformControls = new THREE.TransformControls(camera, renderer.domElement);
-transformControls.addEventListener('change', render);
+//transformControls.addEventListener('change', render);
 transformControls.setTranslationSnap(0.05);
 transformControls.setRotationSnap(THREE.Math.degToRad(15));
 transformControls.setSpace("world");
@@ -36,18 +38,26 @@ scene.add(transformControls);
 
 
 var normalMat = new THREE.MeshNormalMaterial();
-var highlightedMat = new THREE.MeshBasicMaterial({color: 0xFFFF00});
+var highlightedMat1 = new THREE.MeshBasicMaterial({color: 0xFFFF00});
+var highlightedMat2 = new THREE.MeshBasicMaterial({color: 0xFF8000});
 
 var currentObj = null;
 
 function render() {
-    requestAnimationFrame(render);
     raycaster.setFromCamera(mouse, camera);
     var intersects = raycaster.intersectObject(shapesGroup, true);
+
+    for (var i = 0; i < shapesGroup.children.length; i++)
+        shapesGroup.children[i].material = normalMat;
 
     if (intersects.length > 0) {
         renderer.domElement.style = 'cursor: pointer';
         currentObj = intersects[0].object;
+        if (LINK_STATE === 1) {
+            currentObj.material = highlightedMat1;
+        } else if (LINK_STATE === 2) {
+            currentObj.material = highlightedMat2;
+        }
     } else {
         renderer.domElement.style = 'cursor: default';
         currentObj = null;
@@ -55,6 +65,7 @@ function render() {
 
 
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
 }
 
 
@@ -124,18 +135,36 @@ document.getElementById('add-cube').onclick = function() {
 }
 
 document.getElementById('add-sphere').onclick = function() {
-    var geo = new THREE.SphereGeometry(1, 100, 100);
+    var geo = new THREE.SphereGeometry(1, 35, 35);
     var mat = new THREE.MeshNormalMaterial();
     var mesh = new THREE.Mesh(geo, mat);
     shapesGroup.add(mesh);
 }
 
+var LINKS = [];
 var LINK_STATE = null;
+var linkObj1 = null;
+var linkObj2 = null;
 
 document.getElementById('link-button').onclick = function() {
     LINK_STATE = 1;
     //renderContainer.setAttribute('style', 'cursor: pointer');
 }
+
+renderer.domElement.addEventListener('click', function() {
+    if (LINK_STATE === null) return;
+    if (currentObj === null) return;
+    if (LINK_STATE === 1) {
+        linkObj1 = currentObj;
+        LINK_STATE = 2;
+    } else if  (LINK_STATE === 2) {
+        linkObj2 = currentObj;
+        LINKS.push([linkObj1, linkObj2]);
+        console.log(LINKS);
+        LINK_STATE = null;
+    }
+    console.log(LINK_STATE);
+});
 
 renderContainer.onmousemove = function(event) {
     mouse.x = (event.clientX - renderContainer.offsetLeft)/renderContainer.clientWidth * 2 - 1;
@@ -187,5 +216,30 @@ window.onkeydown = function(e) {
         // delete
         transformControls.detach();
         shapesGroup.remove(currentObj);
+    }
+}
+
+function generate(nIters) {
+    var transforms = [];
+    for (var i = 0; i < LINKS.length; i++) {
+        var relTransform = new THREE.Matrix4().getInverse(LINKS[i][0].matrix);
+        relTransform.multiply(LINKS[i][1].matrix);
+        //relTransform.multiply(new THREE.Matrix4().getInverse(LINKS[i][1].matrix));
+        relTransform.multiply(LINKS[i][1].matrix);
+        transforms.push(relTransform);
+    }
+
+    generateRecur(nIters, shapesGroup, transforms, 1);
+}
+
+function generateRecur(nIters, obj, transforms, lvl) {
+    if (lvl > nIters) return;
+    
+    for (var i = 0; i < transforms.length; i++) {
+        var t = transforms[i];
+        var replica = obj.clone();
+        replica.applyMatrix(t);
+        fractalGroup.add(replica);
+        generateRecur(nIters, replica, transforms, lvl+1);
     }
 }
