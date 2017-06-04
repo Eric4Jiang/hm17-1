@@ -56,11 +56,11 @@ init();
 document.getElementById('add-pyramid').onclick = function() {
     var geo = new THREE.CylinderGeometry(1, 3, 3, 4);
     geo.vertices = [
-        new THREE.Vector3( 0, 0, 0 ),
-        new THREE.Vector3( 0, 1, 0 ),
-        new THREE.Vector3( 1, 1, 0 ),
-        new THREE.Vector3( 1, 0, 0 ),
-        new THREE.Vector3( 0.5, 0.5, 1 )
+        new THREE.Vector3( -0.5, -0.5, 0 ),
+        new THREE.Vector3( -0.5, 0.5, 0 ),
+        new THREE.Vector3( 0.5, 0.5, 0 ),
+        new THREE.Vector3( 0.5, -0.5, 0 ),
+        new THREE.Vector3( 0, 0, 1 )
     ];
 
     geo.faces = [
