@@ -82,11 +82,11 @@ init();
 document.getElementById('add-pyramid').onclick = function() {
     var geo = new THREE.CylinderGeometry(1, 3, 3, 4);
     geo.vertices = [
-        new THREE.Vector3( 0, 0, 0 ),
-        new THREE.Vector3( 0, 1, 0 ),
-        new THREE.Vector3( 1, 1, 0 ),
-        new THREE.Vector3( 1, 0, 0 ),
-        new THREE.Vector3( 0.5, 0.5, 1 )
+        new THREE.Vector3( -0.5, -0.5, 0 ),
+        new THREE.Vector3( -0.5, 0.5, 0 ),
+        new THREE.Vector3( 0.5, 0.5, 0 ),
+        new THREE.Vector3( 0.5, -0.5, 0 ),
+        new THREE.Vector3( 0, 0, 1 )
     ];
 
     geo.faces = [
@@ -135,4 +135,6 @@ renderContainer.onmousemove = function(event) {
     //console.log(mouse.x, mouse.y);
 }
 
-
+function showValue(newValue) {
+    document.getElementById("range").innerHTML="Current Layers: " + newValue + "<br>";
+}
