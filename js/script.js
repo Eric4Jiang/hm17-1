@@ -1,50 +1,59 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
+camera.position.set(5, 5, 5);
+camera.lookAt(scene.position);
+camera.up.set(0, 0, 1);
+scene.add(camera);
+
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+var renderContainer = document.getElementById('threejs-panel');
+renderContainer.appendChild( renderer.domElement );
 
-camera.position.z = 5;
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-// loader for STL files
-var loader = new THREE.STLLoader();
+//camera.position.z = 5;
+
 
 function render() {
     requestAnimationFrame( render );
+
     renderer.render(scene, camera);
 }
 
-function uploadFile(){
-    var x = document.getElementById("myFile");
-    var txt = "";
-    var ext = "";
-    if ('files' in x) {
-        if (x.files.length == 0) {
-            txt = "Select one or more files.";
-        } else {
-            var file = x.files[0];
-            if ('name' in file) {
-                n = file.name;
 
-                // check if file is stl
-                ext = n.substring(n.length - 4, n.length);
-                txt += "<strong>Current File: </strong>" + file.name + "<br>";
-                console.log(typeof(file));
-                console.log(ext.localeCompare(".stl"));
-                if (ext.localeCompare(".stl") == 0) {
-                    render();
-                } else {
-                    txt = file.name + " IS NOT AN STL FILE!!! <br>";
-                }
+function init() {
+    var geo = new THREE.BoxGeometry(1,1, 1);
+    var mat = new THREE.MeshNormalMaterial();
+    var mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
 
-                var url = window.URL.createObjectURL(file);
-                loader.load(url, function ( geometry ) {
-                    scene.add( new THREE.Mesh( geometry ) );
-                });
+    // create grid
+    var gridMat = new THREE.LineBasicMaterial({
+        color: 0xFFFFFF,
+        linewidth: 3
+    });
+    for (var x = -5; x <= 5; x++) {
+        var geo = new THREE.Geometry();
+        geo.vertices.push(
+            new THREE.Vector3(x, -5, 0),
+            new THREE.Vector3(x, 5, 0)
+        );
+        var line = new THREE.Line(geo, gridMat);
+        scene.add(line);
 
-            }
-        }
+        var geo = new THREE.Geometry();
+        geo.vertices.push(
+            new THREE.Vector3(-5, x, 0),
+            new THREE.Vector3(5, x, 0)
+        );
+        var line = new THREE.Line(geo, gridMat);
+        scene.add(line);
     }
-    document.getElementById("demo").innerHTML = txt;
+
+
+    render();
 }
+
+init();

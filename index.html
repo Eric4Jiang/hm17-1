@@ -5,16 +5,19 @@
 
     <link href="css/style.css" rel="stylesheet">
 </head>
-<body onload="uploadFile()">
-    <p id="demo"></p>
+<body>
 
     <div class="title">Fractos!</div>
-    <div class="shapePanel">
-        <input type="image" class="button" src="https://s-media-cache-ak0.pinimg.com/originals/22/09/ef/2209ef020027c25f5f08acfc67c10c7d.png"></input>
-        <input type="image" class="button" src="http://www.pngmart.com/files/4/Cube-PNG-File.png"></input>
-        <input type="image" class="button" src="http://dianaprobst.com/wp-content/uploads/2013/08/sphere.png"></input>
+    <div class="shape-panel">
+        <button class="button"><img src="https://s-media-cache-ak0.pinimg.com/originals/22/09/ef/2209ef020027c25f5f08acfc67c10c7d.png"></button>
+        <button class="button"><img src="http://www.pngmart.com/files/4/Cube-PNG-File.png"></button>
+        <button class="button"><img src="http://dianaprobst.com/wp-content/uploads/2013/08/sphere.png"></button>
     </div>
 
+    <div id="threejs-panel"></div>
+    
+    <script src="js/three.js"></script>
+    <script src="js/OrbitControls.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>
