@@ -23,6 +23,7 @@ div.shape-panel {
     height: 90%;
     width: 15%;
     border: 2px solid red;
+    overflow-y: scroll;
 }
 
 .button {

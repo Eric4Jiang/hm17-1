@@ -1,5 +1,7 @@
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.01, 20000 );
+var renderContainer = document.getElementById('threejs-panel');
+var camera = new THREE.PerspectiveCamera(
+    75, renderContainer.clientWidth/renderContainer.clientHeight, 0.01, 20000 );
 
 var mouse = new THREE.Vector2();
 
@@ -8,9 +10,12 @@ camera.lookAt(scene.position);
 camera.up.set(0, 0, 1);
 scene.add(camera);
 
-var renderContainer = document.getElementById('threejs-panel');
+var dpr = window.devicePixelRatio || 1;
+dpr = 1;
+
 var renderer = new THREE.WebGLRenderer();
-renderer.setSize( renderContainer.clientWidth, renderContainer.clientHeight );
+renderer.setPixelRatio(dpr);
+renderer.setSize( renderContainer.clientWidth*dpr, renderContainer.clientHeight*dpr );
 renderContainer.appendChild( renderer.domElement );
 
 var shapesGroup = new THREE.Group();
@@ -20,30 +25,34 @@ var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 var raycaster = new THREE.Raycaster();
 
+var transformControls = new THREE.TransformControls(camera, renderer.domElement);
+transformControls.addEventListener('change', render);
+transformControls.setTranslationSnap(0.05);
+transformControls.setRotationSnap(THREE.Math.degToRad(15));
+transformControls.setSpace("world");
+scene.add(transformControls);
+
 //camera.position.z = 5;
 
 
 var normalMat = new THREE.MeshNormalMaterial();
 var highlightedMat = new THREE.MeshBasicMaterial({color: 0xFFFF00});
 
+var currentObj = null;
+
 function render() {
     requestAnimationFrame(render);
     raycaster.setFromCamera(mouse, camera);
     var intersects = raycaster.intersectObject(shapesGroup, true);
 
-    for (var i = 0; i < shapesGroup.children.length; i++) {
-        shapesGroup.children[i].material = normalMat;
-    }
-
-    console.log(intersects.length);
-    for (var i = 0; i < intersects.length; i++) {
-        intersects[i].object.material = highlightedMat;
-    }
     if (intersects.length > 0) {
         renderer.domElement.style = 'cursor: pointer';
+        currentObj = intersects[0].object;
     } else {
         renderer.domElement.style = 'cursor: default';
+        currentObj = null;
     }
+
 
     renderer.render(scene, camera);
 }
@@ -73,6 +82,7 @@ function init() {
         scene.add(line);
     }
 
+    //setTimeout(resize, 5);
 
     render();
 }
@@ -109,11 +119,13 @@ document.getElementById('add-cube').onclick = function() {
     var mat = new THREE.MeshNormalMaterial();
     var mesh = new THREE.Mesh(geo, mat);
     shapesGroup.add(mesh);
+    //transformControls.attach(mesh);
+    //scene.add(transformControls);
 }
 
 document.getElementById('add-sphere').onclick = function() {
     var geo = new THREE.SphereGeometry(1, 100, 100);
-    var mat = new THREE.MeshBasicMaterial({color: 0x00FF00});
+    var mat = new THREE.MeshNormalMaterial();
     var mesh = new THREE.Mesh(geo, mat);
     shapesGroup.add(mesh);
 }
@@ -121,12 +133,8 @@ document.getElementById('add-sphere').onclick = function() {
 var LINK_STATE = null;
 
 document.getElementById('link-button').onclick = function() {
-    LINK_STAT = 1;
+    LINK_STATE = 1;
     //renderContainer.setAttribute('style', 'cursor: pointer');
-}
-
-renderer.domElement.onclick = function() {
-    console.log('waddup');
 }
 
 renderContainer.onmousemove = function(event) {
@@ -136,5 +144,48 @@ renderContainer.onmousemove = function(event) {
 }
 
 function showValue(newValue) {
-    document.getElementById("range").innerHTML="Current Layers: " + newValue + "<br>";
+    document.getElementById("range").innerHTML="Iterations: " + newValue;
+}
+
+function resize() {
+    camera.aspect = renderContainer.clientWidth / renderContainer.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize( renderContainer.clientWidth, renderContainer.clientHeight );
+
+    render();
+}
+
+window.onresize = resize;
+
+window.onkeydown = function(e) {
+    console.log('keydown', e.keyCode);
+    if (currentObj === null) {
+        if (e.keyCode == 27) {
+            // escape
+            transformControls.detach();
+        }
+        return;
+    }
+
+    if (e.keyCode == 84) {
+        // translate
+        console.log('we ???');
+        transformControls.detach();
+        transformControls.setMode("translate");
+        transformControls.attach(currentObj);
+    } else if (e.keyCode == 82) {
+        // rotate
+        transformControls.detach();
+        transformControls.setMode("rotate");
+        transformControls.attach(currentObj);
+    } else if (e.keyCode == 83) {
+        // scale
+        transformControls.detach();
+        transformControls.setMode("scale");
+        transformControls.attach(currentObj);
+    } else if (e.keyCode == 8) {
+        // delete
+        transformControls.detach();
+        shapesGroup.remove(currentObj);
+    }
 }
