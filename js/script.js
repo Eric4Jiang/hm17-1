@@ -30,7 +30,7 @@ var raycaster = new THREE.Raycaster();
 var transformControls = new THREE.TransformControls(camera, renderer.domElement);
 //transformControls.addEventListener('change', render);
 transformControls.setTranslationSnap(0.05);
-transformControls.setRotationSnap(THREE.Math.degToRad(15));
+transformControls.setRotationSnap(THREE.Math.degToRad(5));
 transformControls.setSpace("world");
 scene.add(transformControls);
 
