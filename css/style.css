@@ -2,3 +2,38 @@ html, body {
     height: 100%;
     font-family: 'Helvetica Neue', Helvetica, sans-serif;
 }
+
+div.title {
+    position: absolute;
+    background: white;
+    height: 10%;
+    width: 100%;
+    border: 5px solid red;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 40px;
+}
+
+div.shapePanel {
+    position: absolute;
+    top: 15%;
+    background: white;
+    height: 80%;
+    width: 14%;
+    border: 5px solid red;
+}
+
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    height:25%;
+    width:85%;
+}
+
