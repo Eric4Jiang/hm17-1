@@ -11,11 +11,10 @@ camera.up.set(0, 0, 1);
 scene.add(camera);
 
 var dpr = window.devicePixelRatio || 1;
-dpr = 1;
 
 var renderer = new THREE.WebGLRenderer();
-renderer.setPixelRatio(dpr);
-renderer.setSize( renderContainer.clientWidth*dpr, renderContainer.clientHeight*dpr );
+//renderer.setPixelRatio(dpr);
+renderer.setSize( renderContainer.clientWidth, renderContainer.clientHeight );
 renderContainer.appendChild( renderer.domElement );
 
 var shapesGroup = new THREE.Group();
@@ -93,7 +92,11 @@ function init() {
         scene.add(line);
     }
 
-    //setTimeout(resize, 5);
+    setTimeout(function() {
+        //renderer.setPixelRatio(dpr);
+        //renderer.setSize( renderContainer.clientWidth, renderContainer.clientHeight );
+        //resize()
+    }, 5);
 
     render();
 }
@@ -225,7 +228,8 @@ function generate(nIters) {
         var relTransform = new THREE.Matrix4().getInverse(LINKS[i][0].matrix);
         relTransform.multiply(LINKS[i][1].matrix);
         //relTransform.multiply(new THREE.Matrix4().getInverse(LINKS[i][1].matrix));
-        relTransform.multiply(LINKS[i][1].matrix);
+        relTransform.premultiply(new THREE.Matrix4().getInverse(LINKS[i][0].matrix));
+        relTransform.multiply(LINKS[i][0].matrix);
         transforms.push(relTransform);
     }
 
